@@ -32,25 +32,64 @@ class AdditiveModel:
             values.append(observed_value)
         return np.array(values)
 
-    # Генерує експериментальні дані як суму двох моделей (випадкової і невипадкової).
+    # Генерує експериментальні дані як суму двох моделей.
     def generate_experimental_data(self):
         constant_process = self.simulate_constant_process()
         measurement_error = self.get_measurement_error()
         additive_data = constant_process + measurement_error
         return additive_data
 
-    def generate_graph(self):
+    def generate_graph_of_additive_model(self):
         data = self.generate_experimental_data()
         constant_changes = np.cumsum(np.full(self.size, self.change_rate)) + self.constant_value
 
-        plt.plot(data, color='b', label="Експериментальні дані")
+        plt.plot(data, color='b', label="Дані")
         plt.axhline(y=self.constant_value, color='r', linestyle='--', label="Дійсне значення")
-        plt.plot(constant_changes, color='g', label="Змінюване ідеальне значення")
+        plt.plot(constant_changes, color='g', label="Дійсне значення із урахування зміни")
 
         plt.xlabel('Номер вимірювання')
         plt.ylabel('Значення')
-        plt.title('Адитивна модель експериментальних даних')
+        plt.title('Адитивна модель')
         plt.legend()
+        plt.show()
+
+    # Обчислює середнє значення.
+    def get_mean_value(self):
+        mean = []
+        for _ in range(self.size):
+            experimental_data = self.generate_experimental_data()
+            mean.append(np.mean(experimental_data))
+
+        return np.mean(mean)
+
+    # Обчислює дисперсію для експериментальних даних
+    def get_dispersion(self):
+        variance = []
+        for _ in range(self.size):
+            experimental_data = self.generate_experimental_data()
+            variance.append(np.var(experimental_data))
+
+        return np.mean(variance)
+
+    # Обчислює середнє стандартне відхилення.
+    def get_standard_deviation(self):
+        standard_deviation = []
+        for _ in range(self.size):
+            experimental_data = self.generate_experimental_data()
+            standard_deviation.append(np.std(experimental_data))
+
+        return np.mean(standard_deviation)
+
+    def generate_graph_of_monte_carlo_results(self):
+        means = []
+        for _ in range(self.size):
+            experimental_data = self.generate_experimental_data()
+            means.append(np.mean(experimental_data))
+
+        plt.hist(means, bins=20, color='blue', edgecolor='black', alpha=0.7)
+        plt.title('Розподіл середніх значень за результатами Монте-Карло')
+        plt.xlabel('Середнє значення')
+        plt.ylabel('Частота')
         plt.show()
 
 
@@ -60,4 +99,12 @@ if __name__ == '__main__':
                           size=30,
                           constant_value=10,
                           change_rate=2)
-    model.generate_graph()
+    model.generate_graph_of_additive_model()
+    model.generate_graph_of_monte_carlo_results()
+
+    mean_of_means = model.get_mean_value()
+    mean_of_standard_deviation = model.get_standard_deviation()
+    dispersion = model.get_dispersion()
+    print(f"Середнє значення: {mean_of_means:.2f}")
+    print(f"Середнє стандартне відхилення: {mean_of_standard_deviation:.2f}")
+    print(f"Дисперсія: {dispersion:.2f}")
