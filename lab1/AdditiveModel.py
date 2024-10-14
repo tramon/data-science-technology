@@ -39,20 +39,6 @@ class AdditiveModel:
         additive_data = constant_process + measurement_error
         return additive_data
 
-    def generate_graph_of_additive_model(self):
-        data = self.generate_experimental_data()
-        constant_changes = np.cumsum(np.full(self.size, self.change_rate)) + self.constant_value
-
-        plt.plot(data, color='b', label="Дані")
-        plt.axhline(y=self.constant_value, color='r', linestyle='--', label="Дійсне значення")
-        plt.plot(constant_changes, color='g', label="Дійсне значення із урахування зміни")
-
-        plt.xlabel('Номер вимірювання')
-        plt.ylabel('Значення')
-        plt.title('Адитивна модель')
-        plt.legend()
-        plt.show()
-
     # Обчислює середнє значення.
     def get_mean_value(self):
         mean = []
@@ -80,18 +66,49 @@ class AdditiveModel:
 
         return np.mean(standard_deviation)
 
+    def generate_graph_of_additive_model(self):
+        data = self.generate_experimental_data()
+        constant_changes = np.cumsum(np.full(self.size, self.change_rate)) + self.constant_value
+
+        plt.plot(data, color='b', label="Дані")
+        plt.axhline(y=self.constant_value, color='r', linestyle='--', label="Значення константи")
+        plt.plot(constant_changes, color='g', label="Дійсне значення із урахування зміни")
+
+        plt.xlabel('Номер вимірювання')
+        plt.ylabel('Значення')
+        plt.title('Адитивна модель')
+        plt.legend()
+        plt.show()
+
     def generate_graph_of_monte_carlo_results(self):
         means = []
         for _ in range(self.size):
             experimental_data = self.generate_experimental_data()
             means.append(np.mean(experimental_data))
 
-        plt.hist(means, bins=20, color='blue', edgecolor='black', alpha=0.7)
-        plt.title('Розподіл середніх значень за результатами Монте-Карло')
+        plt.hist(means, bins=self.size, color='b', edgecolor='black')
+        plt.title('Розподіл середніх значень Монте-Карло')
         plt.xlabel('Середнє значення')
         plt.ylabel('Частота')
         plt.show()
 
+    # Генерує гістограму для експериментальних даних
+    def generate_graph_of_data_distribution(self):
+        data = self.generate_experimental_data()
+        plt.hist(data, bins=self.size, color='g', edgecolor='black')
+        plt.title('Розподіл даних')
+        plt.xlabel('Значення')
+        plt.ylabel('Частота')
+        plt.show()
+
+    # Генерує гістограму розподілу похибки
+    def plot_error_distribution(self):
+        errors = self.get_measurement_error()
+        plt.hist(errors, bins=self.size, color='b', edgecolor='black')
+        plt.title('Розподіл похибки')
+        plt.xlabel('Похибка')
+        plt.ylabel('Частота')
+        plt.show()
 
 if __name__ == '__main__':
     model = AdditiveModel(lowest_error_border=-5,
@@ -99,12 +116,16 @@ if __name__ == '__main__':
                           size=30,
                           constant_value=10,
                           change_rate=2)
-    model.generate_graph_of_additive_model()
-    model.generate_graph_of_monte_carlo_results()
 
     mean_of_means = model.get_mean_value()
     mean_of_standard_deviation = model.get_standard_deviation()
     dispersion = model.get_dispersion()
+
     print(f"Середнє значення: {mean_of_means:.2f}")
     print(f"Середнє стандартне відхилення: {mean_of_standard_deviation:.2f}")
-    print(f"Дисперсія: {dispersion:.2f}")
+    print(f"Дисперсія (міра розподілу похибки) : {dispersion:.2f}")
+
+    model.generate_graph_of_additive_model()
+    model.generate_graph_of_monte_carlo_results()
+    model.generate_graph_of_data_distribution()
+    model.plot_error_distribution()

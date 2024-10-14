@@ -32,7 +32,7 @@ class ConstantProcessWithErrorModel:
         data = self.simulate_constant_process()
 
         plt.plot(data, label="Значення із похибкою")
-        plt.axhline(y=self.constant_value, color='r', linestyle='-', label="Дійсне значення")
+        plt.axhline(y=self.constant_value, color='r', linestyle='-', label="Значення константи")
         plt.axhline(y=np.mean(data), color='g', linestyle='--', label="Середнє значення")
 
         plt.xlabel('Номер вимірювання')
