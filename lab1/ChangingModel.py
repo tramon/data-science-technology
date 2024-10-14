@@ -54,6 +54,6 @@ if __name__ == '__main__':
                                             lowest_error_border=-5,
                                             highest_error_border=5,
                                             size=30,
-                                            change_rate=1)
+                                            change_rate=2)
     observed_data = model.simulate_changing_process()
     model.generate_graph()
