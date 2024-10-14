@@ -22,14 +22,14 @@ class ConstantProcessWithErrorModel:
         return errors
 
     # Функція для симуляції постійного процесу з похибками
-    def simulate_constant_process_with_error(self):
+    def simulate_constant_process(self):
         errors = self.get_measurement_error()
         observed_values = self.constant_value + errors
         return observed_values
 
     # Функція генерації графіку
     def generate_graph(self):
-        data = self.simulate_constant_process_with_error()
+        data = self.simulate_constant_process()
 
         plt.plot(data, label="Значення із похибкою")
         plt.axhline(y=self.constant_value, color='r', linestyle='-', label="Дійсне значення")
@@ -44,5 +44,5 @@ class ConstantProcessWithErrorModel:
 
 if __name__ == '__main__':
     model = ConstantProcessWithErrorModel(lowest_error_border=-5, highest_error_border=5, size=30, constant_value=10)
-    observed_data = model.simulate_constant_process_with_error()
+    observed_data = model.simulate_constant_process()
     model.generate_graph()
