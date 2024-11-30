@@ -110,6 +110,12 @@ class AdditiveModel:
         plt.ylabel('Частота')
         plt.show()
 
+    def get_mse_of_model(self):
+        observed_data = self.generate_experimental_data()
+        predicted_data = self.simulate_constant_process()
+        mse = np.mean(np.square(observed_data - predicted_data))
+        return mse
+
 if __name__ == '__main__':
     model = AdditiveModel(lowest_error_border=-5,
                           highest_error_border=5,
