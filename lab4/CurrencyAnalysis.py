@@ -10,7 +10,7 @@ from lab2.PolynomialRegression import PolynomialRegression
 base_url = "https://api.privatbank.ua/p24api/exchange_rates?date={date}"
 buy = "buy"
 sale = "sale"
-date = "date"
+date_formatter = "%d.%m.%Y"
 
 
 class CurrencyAnalysis:
@@ -20,7 +20,7 @@ class CurrencyAnalysis:
         historical_data = []
 
         for i in range(days_to_fetch):
-            date = (datetime.datetime.now() - datetime.timedelta(days=i)).strftime("%d.%m.%Y")
+            date = (datetime.datetime.now() - datetime.timedelta(days=i)).strftime(date_formatter)
             url = base_url.format(date=date)
             response = requests.get(url)
 
@@ -29,14 +29,14 @@ class CurrencyAnalysis:
                 usd_rate = next((rate for rate in data.get("exchangeRate", []) if rate["currency"] == "USD"), None)
                 if usd_rate:
                     historical_data.append({
-                        date: date,
+                        "date": date,
                         buy: usd_rate.get("purchaseRate"),
                         sale: usd_rate.get("saleRate")
                     })
             else:
                 print(f"Не вдалося отримати дані за {date}. Код: {response.status_code}")
 
-        return pd.DataFrame(historical_data)
+        return pd.DataFrame(historical_data)[::-1]
 
     @staticmethod
     def predict_next_day(exchange_rates, rate_type=buy):
@@ -55,14 +55,14 @@ class CurrencyAnalysis:
         return predicted_rate[0]
 
     @staticmethod
-    def plot_exchange_rates_with_trend(exchange_rates, predicted_value, rate_type=buy):
+    def plot_exchange_rates_with_trend(exchange_rates, predicted_value, rate_type="buy"):
         if rate_type not in [buy, sale]:
             raise ValueError("rate_type має бути 'buy' або 'sale'")
 
-        dates = list(exchange_rates[date])
+        dates = list(exchange_rates["date"])
         rates = list(exchange_rates[rate_type])
 
-        next_date = (pd.to_datetime(dates[-1]) + pd.Timedelta(days=1)).strftime("%Y-%m-%d")
+        next_date = (max(pd.to_datetime(dates, dayfirst=True)) + pd.Timedelta(days=1)).strftime(date_formatter)
         dates.append(next_date)
         rates.append(predicted_value)
 
@@ -89,15 +89,14 @@ if __name__ == '__main__':
     Документація по API pb.ua https://api.privatbank.ua/#p24/exchangeArchive
     """
 
-    amount_of_days_analyzed = 14
-    exchange_rates = CurrencyAnalysis.fetch_usd_rate(amount_of_days_analyzed)
+    exchange_rates = CurrencyAnalysis.fetch_usd_rate(14)
     print(exchange_rates)
 
-    buy_rate_prediction = CurrencyAnalysis.predict_next_day(exchange_rates, rate_type=buy)
-    sale_rate_prediction = CurrencyAnalysis.predict_next_day(exchange_rates, rate_type=sale)
+    buy_rate_prediction = CurrencyAnalysis.predict_next_day(exchange_rates, rate_type="buy")
+    sale_rate_prediction = CurrencyAnalysis.predict_next_day(exchange_rates, rate_type="sale")
 
     print(f"Прогнозований курс купівлі на завтра: {buy_rate_prediction}")
     print(f"Прогнозований курс продажу на завтра: {sale_rate_prediction}")
 
-    CurrencyAnalysis.plot_exchange_rates_with_trend(exchange_rates, buy_rate_prediction, rate_type=buy)
-    CurrencyAnalysis.plot_exchange_rates_with_trend(exchange_rates, sale_rate_prediction, rate_type=sale)
+    CurrencyAnalysis.plot_exchange_rates_with_trend(exchange_rates, buy_rate_prediction, rate_type="buy")
+    CurrencyAnalysis.plot_exchange_rates_with_trend(exchange_rates, sale_rate_prediction, rate_type="sale")
