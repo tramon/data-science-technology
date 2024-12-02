@@ -26,7 +26,13 @@ class CurrencyAnalysis:
 
             if response.status_code == 200:
                 data = response.json()
-                usd_rate = next((rate for rate in data.get("exchangeRate", []) if rate["currency"] == "USD"), None)
+                exchange_rates = data.get("exchangeRate", [])
+                usd_rate = None
+                for rate in exchange_rates:
+                    if rate.get("currency") == "USD":
+                        usd_rate = rate
+                        break
+
                 if usd_rate:
                     historical_data.append({
                         "date": date,
@@ -89,7 +95,7 @@ if __name__ == '__main__':
     Документація по API pb.ua https://api.privatbank.ua/#p24/exchangeArchive
     """
 
-    exchange_rates = CurrencyAnalysis.fetch_usd_rate(14)
+    exchange_rates = CurrencyAnalysis.fetch_usd_rate(9)
     print(exchange_rates)
 
     buy_rate_prediction = CurrencyAnalysis.predict_next_day(exchange_rates, rate_type="buy")
