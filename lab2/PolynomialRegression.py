@@ -5,8 +5,8 @@ from lab1.AdditiveModel import AdditiveModel
 
 
 class PolynomialRegression:
-    def __init__(self):
-        self.degree = 3
+    def __init__(self, degree=None):
+        self.degree = degree
         self.coefficients = None
 
     def learn_using_lsm(self, x_axis, y_axis):
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     x_axis = np.arange(1, additive_model.size + 1)
     y_axis = additive_model.generate_experimental_data()
 
-    polynomial_model = PolynomialRegression()
+    polynomial_model = PolynomialRegression(3)
     polynomial_model.learn_using_lsm(x_axis, y_axis)
     y_axis_prediction = polynomial_model.predict(x_axis)
 
