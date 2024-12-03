@@ -78,7 +78,7 @@ class CurrencyAnalysis:
                  marker="*")
         plt.scatter(next_date, predicted_value, color='Blue', linewidth=8, label=f"Прогноз: {predicted_value:.2f}",
                     zorder=5)
-        plt.title(f"Графік курсу {rate_type} з прогнозом")
+        plt.title(f"Графік курсу USD {rate_type} з прогнозом")
         plt.xlabel("Дата")
         plt.ylabel("Курс")
         plt.xticks(rotation=45)
