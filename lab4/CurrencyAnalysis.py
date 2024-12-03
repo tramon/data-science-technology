@@ -73,7 +73,7 @@ class CurrencyAnalysis:
         rates.append(predicted_value)
 
         plt.figure(figsize=(12, 6))
-        plt.plot(dates[:-1], rates[:-1], label="Курс валют", linewidth=5, color="grey", marker="o")
+        plt.plot(dates[:-1], rates[:-1], label="Курс USD", linewidth=5, color="grey", marker="o")
         plt.plot(dates[-2:], rates[-2:], label="Прогнозований тренд", linewidth=5, color="green", linestyle="--",
                  marker="*")
         plt.scatter(next_date, predicted_value, color='Blue', linewidth=8, label=f"Прогноз: {predicted_value:.2f}",
