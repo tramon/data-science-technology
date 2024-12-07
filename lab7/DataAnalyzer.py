@@ -44,9 +44,35 @@ class DataAnalyzer:
     def plot_sales(data):
         monthly_sales = data.drop(columns=["SALES_ID", "SALES_BY_REGION"]).sum()
         monthly_sales.plot(kind='bar', figsize=(12, 6), color='blue',
-                           title="Всього продажів по місяцям згруповано по регіонам")
+                           title="Всього продажів по місяцям")
         plt.xlabel("Місяць")
         plt.ylabel("Продажі")
+        plt.show()
+
+    @staticmethod
+    def plot_sales_by_region(cleaned_data):
+        regions = cleaned_data['SALES_BY_REGION'].unique()
+        months = cleaned_data.columns[2:]  # Вибираємо місяці як стовпці, починаючи з третього
+
+        plt.figure(figsize=(14, 8))
+
+        for region in regions:
+            region_data = cleaned_data[cleaned_data['SALES_BY_REGION'] == region]
+            if region_data.empty:
+                continue
+
+            # Підсумовуємо дані продажів для кожного місяця в регіоні
+            monthly_sales = region_data.iloc[:, 2:].sum(axis=0).values.astype(float)
+
+            plt.plot(months, monthly_sales, label=region, marker='o')  # Лінія продажів по регіону
+
+        plt.title("Продажі по місяцях з деталізацією по регіонах")
+        plt.xlabel("Місяці")
+        plt.ylabel("Обсяг продажів")
+        plt.legend(title="Регіони")
+        plt.grid(True)
+        plt.xticks(rotation=45)  # Розвертаємо підписи місяців для зручності
+        plt.tight_layout()  # Оптимізує розташування графіка
         plt.show()
 
     @staticmethod
@@ -157,5 +183,7 @@ if __name__ == '__main__':
     cleaned_data = pd.read_csv(cleaned_file_path)
 
     analyzer.plot_sales(data)
+    analyzer.plot_sales_by_region(data)
+
     analyzer.extrapolate_by_region(cleaned_data, "UAQ")
     DataAnalyzer.visualize_sales_and_predictions(cleaned_data)
